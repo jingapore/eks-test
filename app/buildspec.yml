@@ -25,15 +25,3 @@ phases:
   post_build:
     commands:
       - echo Build completed on `date`
-artifacts:
-  files:
-    - '**/*'
-  secondary-artifacts:
-    backend:
-      base-directory: $CODEBUILD_SRC_DIR
-      files:
-        - backend/**/*
-    frontend:
-      base-directory: $CODEBUILD_SRC_DIR
-      files:
-        - frontend/**/*
