@@ -15,7 +15,7 @@ phases:
     commands:
       - echo Build starting on `date`
       - nohup /usr/local/bin/dockerd --host=unix:///var/run/docker.sock --host=tcp://127.0.0.1:2375 --storage-driver=overlay2 & timeout -t 15 sh -c "until docker info; do echo .; sleep 1; done"
-      - docker build -t app-backend:$COMMIT_ID -f backend/Dockerfile
+      - docker build -t app-backend:$COMMIT_ID -f app/backend/Dockerfile app
   post_build:
     commands:
       - echo Build completed on `date`

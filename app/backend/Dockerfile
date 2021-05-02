@@ -6,7 +6,7 @@ ENV TZ Asia/Singapore
 WORKDIR /home
 
 RUN mkdir backend_app
-COPY ./backend_app backend_app
+COPY backend/ backend_app/
 
 # COPY ["requirements.txt", "start.sh"]
 
