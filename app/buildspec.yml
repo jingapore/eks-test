@@ -16,7 +16,8 @@ phases:
   build:
     commands:
       - echo Build starting on `date`
-      - docker build -t app-backend:$COMMIT_ID -f app/backend/Dockerfile app
+      - docker build -t $AWS_ACCOUNT_ID.dkr.ecr.region.amazonaws.com/app-backend:$COMMIT_ID -f app/backend/Dockerfile app
+      - docker push $AWS_ACCOUNT_ID.dkr.ecr.region.amazonaws.com/app-backend:$COMMIT_ID
   post_build:
     commands:
       - echo Build completed on `date`
