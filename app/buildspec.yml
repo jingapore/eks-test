@@ -20,8 +20,14 @@ phases:
   build:
     commands:
       - echo Build starting on `date`
-      - docker build -t $AWS_ACCOUNT_ID.dkr.ecr.ap-southeast-1.amazonaws.com/app-backend:$COMMIT_ID -f app/backend/Dockerfile app
-      - docker push $AWS_ACCOUNT_ID.dkr.ecr.ap-southeast-1.amazonaws.com/app-backend:$COMMIT_ID
+      - docker build -t $AWS_ACCOUNT_ID.dkr.ecr.ap-southeast-1.amazonaws.com/app-backend:${COMMIT_ID} -f app/backend/Dockerfile app
+      - docker push $AWS_ACCOUNT_ID.dkr.ecr.ap-southeast-1.amazonaws.com/app-backend:${COMMIT_ID}
   post_build:
     commands:
       - echo Build completed on `date`
+      - echo ${COMMIT_ID} > app/commid_id.txt
+      
+artifacts:
+  files:
+    - app/commid_id.txt
+  name: commid_id-$(date +%Y-%m-%d).txt
