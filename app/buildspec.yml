@@ -25,9 +25,3 @@ phases:
   post_build:
     commands:
       - echo Build completed on `date`
-      - echo ${COMMIT_ID} > app/commid_id.txt
-      
-artifacts:
-  files:
-    - app/commid_id.txt
-  name: commid_id-$(date +%Y-%m-%d).txt
