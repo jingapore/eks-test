@@ -1,4 +1,4 @@
-FROM python:3.8-slim-buster
+FROM public.ecr.aws/v8e9s2p2/python37-slim-buster:latest
 
 #set ENV timezone for timestamping
 ENV TZ Asia/Singapore
