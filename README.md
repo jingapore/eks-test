@@ -36,3 +36,9 @@ docker run -d -v ~/.aws-lambda-rie:/aws-lambda -p 9000:8080 \
 lambda:latest \
 /usr/local/bin/python -m awslambdaric app.handler
 ```
+
+# Gotchas to watch out for
+
+Be careful not to run `3_cicd-resources` when virtualenv is running, because the aws executable called will be different from what is otherwise running on your local machine.
+
+The result of runnning virtualenv on my computer, is that the command `aws codecommit` does not upload the decoded base64 representation. Rather, the raw base64 representation goes into CodeCommit. This may in fact be OK, but could be due to the different aws executables being called.

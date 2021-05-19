@@ -17,7 +17,7 @@ resource "aws_vpc_endpoint" "ec2" {
   service_name        = "com.amazonaws.ap-southeast-1.ec2"
   vpc_endpoint_type   = "Interface"
   private_dns_enabled = true
-  subnet_ids          = data.aws_subnet_ids.subset.ids
+  subnet_ids          = data.aws_subnet_ids.web.ids
 
   security_group_ids = [aws_security_group.endpoint_ec2.id]
 }

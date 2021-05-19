@@ -68,6 +68,15 @@ resource "aws_iam_policy" "codepipeline" {
         ],
         "Resource": "*",
         "Effect": "Allow"
+      },
+      {
+        "Sid": "AllowLambdaActions",
+        "Action": [
+          "lambda:InvokeFunction",
+          "lambda:ListFunctions"
+        ],
+        "Resource": "*",
+        "Effect": "Allow"
       }
     ],
     "Version": "2012-10-17"
@@ -81,6 +90,10 @@ resource "aws_iam_role_policy_attachment" "codepipeline_attachment" {
 }
 
 resource "aws_s3_bucket_policy" "codepipeline_bucket_policy" {
+  # this bucket is used by 2 codepipelines: 
+  # (1) for main, (2) for lambda image.
+  # but there is no need to give separate permissions for each pipeline, 
+  # because the roles of both CodePipeline and CodeBuild are the same.
   bucket = aws_s3_bucket.codepipeline_bucket.id
   policy = <<-EOF
   {
@@ -117,6 +130,12 @@ resource "aws_codepipeline" "codepipeline" {
     type     = "S3"
   }
 
+  # under stage/action's output_artifacts, we use abbreviated name, 
+  # e.g. "source" instead of "source_output". 
+  # this is because AWS truncates the s3 bucket key for the dir.
+  # according to the forums, this is to ensure that the s3 key meets s3 policies, 
+  # after appending the hash.
+
   stage {
     name = "Source"
     action {
@@ -126,7 +145,7 @@ resource "aws_codepipeline" "codepipeline" {
       owner            = "AWS"
       provider         = "CodeCommit"
       version          = "1"
-      output_artifacts = ["source_output"]
+      output_artifacts = ["source"]
 
       configuration = {
         RepositoryName       = aws_codecommit_repository.eks_test.repository_name
@@ -144,13 +163,30 @@ resource "aws_codepipeline" "codepipeline" {
       category         = "Build"
       owner            = "AWS"
       provider         = "CodeBuild"
-      input_artifacts  = ["source_output"]
-      output_artifacts = ["build_output"]
+      input_artifacts  = ["source"]
+      output_artifacts = ["build"]
       version          = "1"
 
       configuration = {
         ProjectName          = aws_codebuild_project.build_docker_image.name
         EnvironmentVariables = "[{\"name\":\"COMMIT_ID\",\"value\":\"#{SourceVariables.CommitId}\",\"type\":\"PLAINTEXT\"}]"
+      }
+    }
+  }
+
+  stage {
+    name = "Invoke"
+
+    action {
+      name     = "Invoke"
+      category = "Invoke"
+      owner    = "AWS"
+      provider = "Lambda"
+      version  = "1"
+
+      configuration = {
+        FunctionName   = aws_lambda_function.deploy_kubernetes.function_name
+        UserParameters = "#{SourceVariables.CommitId}"
       }
     }
   }
@@ -166,8 +202,8 @@ resource "aws_codecommit_repository" "eks_test" {
   }
 }
 
-resource "aws_ecr_repository" "app_backend" {
-  name                 = "app-backend"
+resource "aws_ecr_repository" "backend_repo" {
+  name                 = "backend-repo"
   image_tag_mutability = "MUTABLE"
 
   image_scanning_configuration {

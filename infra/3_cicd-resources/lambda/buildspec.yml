@@ -1,0 +1,33 @@
+version: 0.2
+
+env:
+  variables:
+    HOME_DIR: "/home/ec2-user"
+
+phases:
+  install:
+    runtime-versions:
+      python: 3.8
+    commands:
+      - pip install --upgrade pip
+      - yum install -y python-devel
+      - nohup /usr/local/bin/dockerd --host=unix:///var/run/docker.sock --host=tcp://127.0.0.1:2375 --storage-driver=overlay2 &
+      - timeout 15 sh -c "until docker info; do echo .; sleep 1; done"
+  pre_build:
+    commands:
+      - echo Logging in to Amazon ECR...
+      - aws ecr get-login-password --region ap-southeast-1 | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.ap-southeast-1.amazonaws.com
+  build:
+    commands:
+      - echo Build starting on `date`
+      - docker build -t $AWS_ACCOUNT_ID.dkr.ecr.ap-southeast-1.amazonaws.com/lambda:$COMMIT_ID -f lambda/Dockerfile lambda
+      - docker push $AWS_ACCOUNT_ID.dkr.ecr.ap-southeast-1.amazonaws.com/lambda:$COMMIT_ID
+  post_build:
+    commands:
+      - echo Build completed on `date`
+      - echo ${COMMIT_ID} > lambda/commid_id.txt
+      
+artifacts:
+  files:
+    - lambda/commid_id.txt
+  name: commid_id-$(date +%Y-%m-%d).txt

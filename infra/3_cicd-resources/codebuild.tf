@@ -106,6 +106,12 @@ resource "aws_codebuild_project" "build_docker_image" {
     }
   }
 
+  # buildspec is located in sub dir, where there are 2 subdirs: 
+  # (1) infra, and (2) app. 
+  # but within buildspec, the home is not the subdir (i.e. app) 
+  # so you have to reference the full path from the root dir 
+  # in the buildspec.
+
   source {
     type      = "CODEPIPELINE"
     buildspec = "app/buildspec.yml"
