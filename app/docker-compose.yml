@@ -1,0 +1,13 @@
+version: "3.2"
+
+services:
+    backend:
+        build:
+            context: ./backend
+            dockerfile: Dockerfile
+        image: eks_test_backend:1.0
+        container_name: eks_test_backend_container
+        env_file:
+            - backend-variables.env
+        ports:
+            - "5000:5000"

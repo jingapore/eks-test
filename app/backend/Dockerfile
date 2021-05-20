@@ -1,24 +1,9 @@
 FROM public.ecr.aws/v8e9s2p2/python37-slim-buster:latest
 
 #set ENV timezone for timestamping
-ENV TZ Asia/Singapore
-
 WORKDIR /home
-
-RUN mkdir backend_app
-COPY backend/ backend_app/
-
-# COPY ["requirements.txt", "start.sh"]
-
-# RUN ["chmod", "+x", "start.sh"]
-
-# # install dependencies
-# RUN apt-get update && \
-#     apt-get upgrade -y && \
-#     apt-get install -y netcat-openbsd gcc libpq-dev python3-dev redis-server && \
-#     apt-get install libsasl2-dev libldap2-dev libssl-dev && \
-#     apt-get clean
-
-# RUN pip3 install -r requirements.txt
-
-# CMD ["./start.sh"]
+RUN mkdir backend
+COPY . backend/
+RUN ["chmod", "+x", "/home/backend/start.sh"]
+RUN ["pip3", "install", "-r", "/home/backend/requirements.txt"]
+CMD ["/home/backend/start.sh"]
