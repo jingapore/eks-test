@@ -26,7 +26,27 @@ IAM user with admin privileges. You will also have to use AWS console to generat
 
 S3 bucket for storing state. In this repo, we hard-code the bucket name is "ekstest-terraformstatebucket". But you may not be able to create this bucket. If so, rename the hard coded name.
 
-# Lambda function
+## Structure of modules
+
+### 1_network-resources
+
+### 2_kubernetes-cluster
+This initialises the cluster, as well as the node group.
+
+### 3_cicd_resources
+This creates two CodePipelines.
+- CodePipeline 1: To build image for Lambda function.
+- CodePipeline 2: To build new app images detected by changes to CodeCommit, and to update Kubernetes deployment accordingly using Lambda function.
+
+### 4_kubernetes-deployment-and-service
+This uses Terraform to provision Kubernetes Deployments and Kubernetes Services.
+
+I had contemplated provisioning the abovementioned via the Lambda function in `3_cicd_resources`. But this would lead to issues destroying AWS resources, in particular the Kubernetes Services' AWS loadbalancers and target groups.
+
+Hence, I opted to stick to Terraform to provision the abovementioned.
+
+# General points
+## Working with Lambda functions
 
 To run using emulator, run this command:
 
