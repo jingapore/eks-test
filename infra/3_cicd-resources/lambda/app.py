@@ -174,92 +174,90 @@ def handler(event, context):
                     pretty=True,
                 )
                 pprint(api_response)
-        else:
-            print("Creating deployments and services...")
-            # create deployment
-            for node_type, networking_dict in node_type_with_networking_dict.items():
-                print("Working on {node_type}".format(node_type=node_type))
-                print("Creating namespace")
-                api_response = api_instance_corev1.create_namespace(client.V1Namespace(metadata=client.V1ObjectMeta(name=namespace)))
-                pprint(api_response)
-                deployment_manifest = {
-                    "metadata": {"name": node_type, "namespace": namespace},
-                    "spec": {
-                        "replicas": 1,
-                        "selector": {"matchLabels": {"app": node_type}},
-                        "template": {
-                            "metadata": {"labels": {"app": node_type}},
-                            "spec": {
-                                "containers": [
-                                    {
-                                        "name": "{node_type}-container".format(
-                                            node_type=node_type
-                                        ),
-                                        "image": "{aws_account_id}.dkr.ecr.{aws_region}.amazonaws.com/{node_type}-repo:{commit_id}".format(
-                                            aws_account_id=aws_account_id,
-                                            aws_region=aws_region,
-                                            commit_id=commit_id,
-                                            node_type=node_type,
-                                        ),
-                                        "ports": [
-                                            {
-                                                "containerPort": networking_dict[
-                                                    "internal_port"
-                                                ]
-                                            }
-                                        ],
-                                        "envFrom": [
-                                            {
-                                                "configMapRef": {
-                                                    "name": "{node_type}-config".format(
-                                                        node_type=node_type
-                                                    )
-                                                }
-                                            }
-                                        ],
-                                    }
-                                ],
-                            },
-                        },
-                    },
-                }
-                print("Creating namespaced deployment")
-                api_response = api_instance_appsv1.create_namespaced_deployment(
-                    namespace=namespace, body=deployment_manifest
-                )
-                pprint(api_response)
-                service_manifest = {
-                    "metadata": {
-                        "name": "{node_type}-balancer".format(node_type=node_type),
-                        "namespace": namespace,
-                        "annotations": [
-                            {
-                                "service.beta.kubernetes.io/aws-load-balancer-type": "nlb"
-                            },
-                            {
-                                "service.beta.kubernetes.io/aws-load-balancer-internal": "true"
-                            },
-                        ],
-                    },
-                    "spec": {
-                        "selector": {"app": node_type},
-                        "sessionAffinity": "None",
-                        "ports": [
-                            {
-                                "port": networking_dict["external_port"],
-                                "targetPort": networking_dict["internal_port"],
-                            }
-                        ],
-                        "clusterIp": networking_dict["internal_lb_ip"],
-                        "type": "LoadBalancer",
-                    },
-                    "waitForLoadalancer": "false",
-                }
-                print("Creating namespaced service")
-                api_response = api_instance_corev1.create_namespaced_service(
-                    namespace=namespace, body=service_manifest
-                )
-                pprint(api_response)
+        # else:
+        #     print("Creating deployments and services...")
+        #     # create deployment
+        #     for node_type, networking_dict in node_type_with_networking_dict.items():
+        #         print("Working on {node_type}".format(node_type=node_type))
+        #         print("Creating namespace")
+        #         api_response = api_instance_corev1.create_namespace(
+        #             client.V1Namespace(metadata=client.V1ObjectMeta(name=namespace))
+        #         )
+        #         pprint(api_response)
+        #         deployment_manifest = {
+        #             "metadata": {"name": node_type, "namespace": namespace},
+        #             "spec": {
+        #                 "replicas": 1,
+        #                 "selector": {"matchLabels": {"app": node_type}},
+        #                 "template": {
+        #                     "metadata": {"labels": {"app": node_type}},
+        #                     "spec": {
+        #                         "containers": [
+        #                             {
+        #                                 "name": "{node_type}-container".format(
+        #                                     node_type=node_type
+        #                                 ),
+        #                                 "image": "{aws_account_id}.dkr.ecr.{aws_region}.amazonaws.com/{node_type}-repo:{commit_id}".format(
+        #                                     aws_account_id=aws_account_id,
+        #                                     aws_region=aws_region,
+        #                                     commit_id=commit_id,
+        #                                     node_type=node_type,
+        #                                 ),
+        #                                 "ports": [
+        #                                     {
+        #                                         "containerPort": networking_dict[
+        #                                             "internal_port"
+        #                                         ]
+        #                                     }
+        #                                 ],
+        #                                 "envFrom": [
+        #                                     {
+        #                                         "configMapRef": {
+        #                                             "name": "{node_type}-config".format(
+        #                                                 node_type=node_type
+        #                                             )
+        #                                         }
+        #                                     }
+        #                                 ],
+        #                             }
+        #                         ],
+        #                     },
+        #                 },
+        #             },
+        #         }
+        #         print("Creating namespaced deployment")
+        #         api_response = api_instance_appsv1.create_namespaced_deployment(
+        #             namespace=namespace, body=deployment_manifest
+        #         )
+        #         pprint(api_response)
+        #         service_manifest = {
+        #             "metadata": {
+        #                 "name": "{node_type}-balancer".format(node_type=node_type),
+        #                 "namespace": namespace,
+        #                 "annotations": {
+        #                     "service.beta.kubernetes.io/aws-load-balancer-type": "nlb",
+        #                     "service.beta.kubernetes.io/aws-load-balancer-internal": "true",
+        #                 },
+        #             },
+        #             "spec": {
+        #                 "selector": {"app": node_type},
+        #                 "sessionAffinity": "None",
+        #                 "ports": [
+        #                     {
+        #                         "port": networking_dict["external_port"],
+        #                         "targetPort": networking_dict["internal_port"],
+        #                     }
+        #                 ],
+        #                 "clusterIp": networking_dict["internal_lb_ip"],
+        #                 "type": "LoadBalancer",
+        #             },
+        #             "waitForLoadalancer": "false",
+        #         }
+        #         print("Creating namespaced service")
+        #         api_response = api_instance_corev1.create_namespaced_service(
+        #             namespace=namespace, body=service_manifest
+        #         )
+        #         pprint(api_response)
         put_job_success(job_id, "Stack update complete")
     except Exception as e:
         print("Function failed due to exception.")

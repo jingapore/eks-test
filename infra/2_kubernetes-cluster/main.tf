@@ -1,7 +1,7 @@
 terraform {
   backend "s3" {
     bucket = "ekstest-terraformstatebucket"
-    key    = "2a/eks-test-terraform-state.tfstate"
+    key    = "2/eks-test-terraform-state.tfstate"
     region = "ap-southeast-1"
   }
 }

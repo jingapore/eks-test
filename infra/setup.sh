@@ -20,3 +20,17 @@ for DIRECTORYNAME in */
     done
 
 echo -e '\nHave changed all mentions of aws_profile in .tf files to AWS_PROFILE'
+
+# load .env files as variables
+for FILENAME in $(ls ./config | egrep -o '.*\.env' | sed 's/^/.\/config\//')
+    do
+        echo "setting TF_VAR variables from ${FILENAME}"
+        LABEL=$(echo ${FILENAME} | sed 's/\.\/config\///' | sed 's/-/_/g' | sed 's/\.env$//')
+        echo "label is: ${LABEL}"
+        # use function tolower() because terraform cannot read uppercase names
+        AWK_OUTPUT=$(awk -F "=" -v LABEL="${LABEL}" '{print "TF_VAR_" LABEL "_" tolower($1) "=" tolower($2);}' $FILENAME | sed 's/*/\*/g')
+        # note that double quotes needed to enclose ${line}, 
+        # otherwise export will try to break 'apoc.*, gs.*' into two variables 
+        # due to comma and space
+        while IFS= read -r line ; do export "${line}"; done <<< "$AWK_OUTPUT"
+    done

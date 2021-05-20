@@ -177,7 +177,7 @@ resource "aws_iam_role_policy_attachment" "AmazonEC2ContainerRegistryReadOnly" {
 resource "aws_launch_template" "node_group_backend" {
   name = "node_group_backend"
 
-  instance_type = "t3.micro"
+  instance_type = "t2.micro"
 
   tag_specifications {
     resource_type = "instance"

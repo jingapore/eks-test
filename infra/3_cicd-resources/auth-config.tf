@@ -21,25 +21,26 @@
 #   }
 # }
 
-# resource "null_resource" "k8s_patcher" {
-#   # reference: https://github.com/hashicorp/terraform-provider-kubernetes/issues/723
-#   # download kubectl and patch the default namespace
-#   provisioner "local-exec" {
-#     command = <<-EOH
-#     cat >/tmp/kube_ca.crt <<-EOF
-#     ${base64decode(data.aws_eks_cluster.default.certificate_authority.0.data)}
-#     EOF
-#     curl -LO https://amazon-eks.s3.us-west-2.amazonaws.com/1.19.6/2021-01-05/bin/darwin/amd64/kubectl && \
-#     chmod +x ./kubectl
-#     ./kubectl \
-#       --server="https://${data.aws_eks_cluster.default.endpoint}" \
-#       --token="${data.aws_eks_cluster_auth.default.token}" \
-#       --certificate_authority=/tmp/kube_ca.crt \
-#       -n kube-system \
-#       patch configmap/aws-auth --patch ${data.template_file.auth_config_new.rendered}
-#     EOH
-#   }
-# }
+resource "null_resource" "k8s_patcher" {
+  # reference: https://github.com/hashicorp/terraform-provider-kubernetes/issues/723
+  # download kubectl and patch the default namespace
+  provisioner "local-exec" {
+    command = <<-EOH
+    cat >/tmp/kube_ca.crt <<-EOF
+    ${base64decode(data.aws_eks_cluster.default.certificate_authority.0.data)}
+    EOF
+    curl -LO https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl && \
+    echo "https://${data.aws_eks_cluster.default.endpoint}" && \
+    chmod +x ./kubectl
+    ./kubectl \
+    --server="${data.aws_eks_cluster.default.endpoint}" \
+    --token="${data.aws_eks_cluster_auth.default.token}" \
+    --certificate-authority=/tmp/kube_ca.crt \
+    -n kube-system \
+    patch configmap/aws-auth --patch "${data.template_file.auth_config_new.rendered}"
+    EOH
+  }
+}
 
 data "template_file" "auth_config_new" {
   template = file("${path.module}/auth-config-new.yaml")

@@ -46,6 +46,17 @@ resource "aws_iam_policy" "codebuild_put_image_to_ecr" {
           "Resource": "*"
         },
         {
+            "Sid": "EnableCreationAndManagementOfCloudwatchLogGroupsAndStreams",
+            "Effect": "Allow",
+            "Action": [
+                "logs:CreateLogStream",
+                "logs:DescribeLogStreams",
+                "logs:PutRetentionPolicy",
+                "logs:CreateLogGroup"
+            ],
+            "Resource": "*"
+        },
+        {
           "Sid": "S3AccessPolicy",
           "Effect": "Allow",
           "Action": [

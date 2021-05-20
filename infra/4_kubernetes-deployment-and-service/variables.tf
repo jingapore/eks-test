@@ -20,13 +20,22 @@ variable "backend_variables_mock_variable_1" {
 }
 
 variable "eks_cluster_name" {
-  type = string
-  default = ""
-  description = "name of eks cluster, where cluster is created in previous module"
+  type        = string
+  description = "name of eks cluster"
 }
 
-variable "terraform_iam_identifier" {
+
+variable "vpc_id" {
+  type        = string
+  default     = ""
+  description = "vpc id"
+}
+
+variable "backend_commit_id" {
   type = string
   default = ""
-  description = "iam identifier to be added to do-not-deny policy for s3 bucket"
+  description = <<-EOF
+  commit id for backend that will be used for image tag in deployment, 
+  but will not be needed after backend deployment has been initialised
+  EOF
 }
