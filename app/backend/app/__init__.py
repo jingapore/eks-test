@@ -26,6 +26,6 @@ def create_app(test_config=None):
     # a simple page that says hello
     @app.route('/')
     def hello():
-        return 'Hello, World!\nEnv Variable is {}\n202105251532'.format(os.getenv("MOCK_VARIABLE_1"))
+        return 'Hello, World!\nEnv Variable is {}\n202105251821'.format(os.getenv("MOCK_VARIABLE_1"))
 
     return app
