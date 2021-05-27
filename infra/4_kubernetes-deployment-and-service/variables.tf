@@ -25,6 +25,17 @@ variable "eks_cluster_name" {
 }
 
 
+variable "public_subnet_az_a_id" {
+  type        = string
+  description = "name of public subnet in az a, for loadbalancer"
+}
+
+
+variable "public_subnet_az_b_id" {
+  type        = string
+  description = "name of public subnet in az b, for loadbalancer"
+}
+
 variable "vpc_id" {
   type        = string
   default     = ""

@@ -76,8 +76,7 @@ resource "aws_route_table" "private" {
 }
 
 resource "aws_route_table_association" "private" {
-  count = var.create_s3_vpce ? length(data.aws_subnet_ids.total.ids) : 0
-  #   for_each       = data.aws_subnet_ids.total.ids
-  subnet_id      = tolist(data.aws_subnet_ids.total.ids)[count.index]
+  count = var.create_s3_vpce ? length(data.aws_subnet_ids.private_total.ids) : 0
+  subnet_id      = tolist(data.aws_subnet_ids.private_total.ids)[count.index]
   route_table_id = aws_route_table.private.id
 }

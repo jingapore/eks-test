@@ -51,11 +51,20 @@ data "aws_subnet_ids" "db" {
   }
 }
 
+data "aws_subnet_ids" "private_total" {
+  vpc_id = var.vpc_id
+
+  tags = {
+    Name = "eks-test-sub-*-*"
+    Tier = "Private"
+  }
+}
+
 data "aws_subnet_ids" "total" {
   vpc_id = var.vpc_id
 
   tags = {
-    Name = "*sub*"
+    Name = "eks-test-sub-*-*"
   }
 }
 
@@ -177,7 +186,7 @@ resource "aws_iam_role_policy_attachment" "AmazonEC2ContainerRegistryReadOnly" {
 resource "aws_launch_template" "node_group_backend" {
   name = "node_group_backend"
 
-  instance_type = "t2.micro"
+  instance_type = "t3.small"
 
   tag_specifications {
     resource_type = "instance"

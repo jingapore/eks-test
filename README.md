@@ -45,6 +45,10 @@ I had contemplated provisioning the abovementioned via the Lambda function in `3
 
 Hence, I opted to stick to Terraform to provision the abovementioned.
 
+There are a few *things to note* when running this module.
+1. This module is only run once, to create the initial deployments and services. Subsequent changes are handled by a Lambda function in `3_cicd_resources`.
+2. Before running this module, there is a need to re-init Terraform because the Kubernetes provider needs to get data.
+
 # General points
 ## Working with Lambda functions
 
