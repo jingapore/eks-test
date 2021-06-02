@@ -42,6 +42,7 @@ def put_job_success(job, message):
 
 def handler(event, context):
     import os
+    import json
     from kubernetes import client, config
     from kubernetes.client.rest import ApiException
     from pprint import pprint
@@ -50,18 +51,22 @@ def handler(event, context):
         # environment variables
         job_id = event["CodePipeline.job"]["id"]
         job_data = event["CodePipeline.job"]["data"]
-        commit_id = job_data["actionConfiguration"]["configuration"]["UserParameters"]
+        user_parameters_decoded = json.loads(
+            job_data["actionConfiguration"]["configuration"]["UserParameters"]
+        )
+        print(user_parameters_decoded)
+        commit_id = str(user_parameters_decoded["commit_id"])
+        cluster_name = str(user_parameters_decoded["cluster_name"])
         # not necessary as we do not yet pass artifacts from previous stage
         # artifacts = job_data["inputArtifacts"]
         aws_region = os.getenv("AWS_REGION")
-        namespace = "eks-test"
+        namespace = "coi"
         aws_account_id = os.getenv("AWS_ACCOUNT_ID")
         # role_arn = os.getenv("LAMBDA_ROLE_ARN")
 
         # set kubeconfig
         # https://stackoverflow.com/questions/54953190/amazon-eks-generate-update-kubeconfig-via-python-script
         # Set up the client
-        cluster_name = "eks-cluster"
         config_file_path = os.path.join("/tmp", "config")
         eks = boto3.client("eks")
 
