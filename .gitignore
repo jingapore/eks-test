@@ -37,7 +37,6 @@ terraform.rc
 **/*.code-workspace
 
 **/.terraform.lock.hcl
-**/auth-config-new*.yaml
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
