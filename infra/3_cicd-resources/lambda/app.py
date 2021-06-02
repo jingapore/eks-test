@@ -60,7 +60,7 @@ def handler(event, context):
         # not necessary as we do not yet pass artifacts from previous stage
         # artifacts = job_data["inputArtifacts"]
         aws_region = os.getenv("AWS_REGION")
-        namespace = "coi"
+        namespace = "eks-test" #may wish to softcode this
         aws_account_id = os.getenv("AWS_ACCOUNT_ID")
         # role_arn = os.getenv("LAMBDA_ROLE_ARN")
 
@@ -74,7 +74,7 @@ def handler(event, context):
         cluster = eks.describe_cluster(name=cluster_name)
         cluster_cert = cluster["cluster"]["certificateAuthority"]["data"]
         cluster_ep = cluster["cluster"]["endpoint"]
-        cluster_arn = "arn:aws:eks:ap-southeast-1:126966121768:cluster/eks-cluster"
+        cluster_arn = cluster["cluster"]["arn"]
 
         # build the cluster config hash
         cluster_config = {

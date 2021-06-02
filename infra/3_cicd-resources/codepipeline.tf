@@ -186,7 +186,7 @@ resource "aws_codepipeline" "codepipeline" {
 
       configuration = {
         FunctionName   = aws_lambda_function.deploy_kubernetes.function_name
-        UserParameters = "#{SourceVariables.CommitId}"
+        UserParameters = "{\"commit_id\":\"#{SourceVariables.CommitId}\",\"cluster_name\":\"${var.eks_cluster_name}\"}"
       }
     }
   }
